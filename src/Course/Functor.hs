@@ -9,6 +9,7 @@ import Course.ExactlyOne
 import Course.Optional
 import Course.List
 import qualified Prelude as P(fmap)
+import qualified Course.List as List
 
 -- | All instances of the `Functor` type-class must satisfy two laws. These laws
 -- are not checked by the compiler. These laws are given as:
@@ -41,8 +42,7 @@ instance Functor ExactlyOne where
     (a -> b)
     -> ExactlyOne a
     -> ExactlyOne b
-  (<$>) =
-    error "todo: Course.Functor (<$>)#instance ExactlyOne"
+  (<$>) f (ExactlyOne x) = ExactlyOne (f x)
 
 -- | Maps a function on the List functor.
 --
@@ -57,7 +57,7 @@ instance Functor List where
     -> List a
     -> List b
   (<$>) =
-    error "todo: Course.Functor (<$>)#instance List"
+    List.map
 
 -- | Maps a function on the Optional functor.
 --
@@ -71,8 +71,7 @@ instance Functor Optional where
     (a -> b)
     -> Optional a
     -> Optional b
-  (<$>) =
-    error "todo: Course.Functor (<$>)#instance Optional"
+  (<$>) = mapOptional
 
 -- | Maps a function on the reader ((->) t) functor.
 --
@@ -83,8 +82,7 @@ instance Functor ((->) t) where
     (a -> b)
     -> ((->) t a)
     -> ((->) t b)
-  (<$>) =
-    error "todo: Course.Functor (<$>)#((->) t)"
+  (<$>) f g x = f (g x)
 
 -- | Anonymous map. Maps a constant value on a functor.
 --
@@ -99,8 +97,7 @@ instance Functor ((->) t) where
   a
   -> k b
   -> k a
-(<$) =
-  error "todo: Course.Functor#(<$)"
+(<$) a b  = const a <$> b
 
 -- | Apply a value to a functor-of-functions.
 --
@@ -115,17 +112,18 @@ instance Functor ((->) t) where
 -- We will talk about 'Applicative' soon.
 --
 -- >>> (*2) :. (+1) :. const 99 :. Nil ?? 8
--- [16,9,99]
+-- WAS [16,9,99]
+-- NOW todo: Course.Functor#(??)
 --
 -- >>> Empty ?? 2
--- Empty
+-- WAS Empty
+-- NOW todo: Course.Functor#(??)
 (??) ::
   Functor k =>
   k (a -> b)
   -> a
   -> k b
-(??) ff a =
-  error "todo: Course.Functor#(??)"
+(??) ff a = (<$>) (\f -> f a) ff
 
 infixl 1 ??
 
@@ -146,8 +144,7 @@ void ::
   Functor k =>
   k a
   -> k ()
-void =
-  error "todo: Course.Functor#void"
+void = (<$) ()
 
 -----------------------
 -- SUPPORT LIBRARIES --
